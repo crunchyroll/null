@@ -133,3 +133,27 @@ func (t Time) Ptr() *time.Time {
 	}
 	return &t.Time
 }
+
+// For Upper.io compatibility implementing MarshalDB/UnmarshalDB
+
+// MarshalDB converts  null.Bool to a bool value that can be used to store into DB
+func (t Time) MarshalDB() (interface{}, error) {
+	if !t.Valid {
+		return nil, nil
+	}
+	return t.Time, nil
+}
+
+// MarshalDB converts a string  when read from db to a null.Bool
+func (t Time) UnmarshalDB(v interface{}) error {
+	switch ty := v.(type) {
+	case string:
+		t.UnmarshalText([]byte(ty))
+	case nil:
+		t.Valid = false
+	default:
+		return ErrUnsupportedValue
+	}
+
+	return nil
+}

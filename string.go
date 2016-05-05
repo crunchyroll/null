@@ -108,3 +108,27 @@ func (s String) Ptr() *string {
 func (s String) IsZero() bool {
 	return !s.Valid
 }
+
+// For Upper.io compatibility implementing MarshalDB/UnmarshalDB
+
+// MarshalDB converts  null.String to a string value that can be used to store into DB
+func (s String) MarshalDB() (interface{}, error) {
+	if !s.Valid {
+		return nil, nil
+	}
+	return s.String, nil
+}
+
+// MarshalDB converts a string  when read from db to a null.String
+func (s *String) UnmarshalDB(v interface{}) error {
+	switch t := v.(type) {
+	case string:
+		s.UnmarshalText([]byte(t))
+	case nil:
+		s.Valid = false
+	default:
+		return ErrUnsupportedValue
+	}
+
+	return nil
+}

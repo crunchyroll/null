@@ -74,7 +74,11 @@ func (b *Bool) UnmarshalText(text []byte) error {
 		return nil
 	case "true":
 		b.Bool = true
+	case "1":
+		b.Bool = true
 	case "false":
+		b.Bool = false
+	case "0":
 		b.Bool = false
 	default:
 		b.Valid = false
@@ -126,4 +130,28 @@ func (b Bool) Ptr() *bool {
 // A non-null Bool with a 0 value will not be considered zero.
 func (b Bool) IsZero() bool {
 	return !b.Valid
+}
+
+// For Upper.io compatibility implementing MarshalDB/UnmarshalDB
+
+// MarshalDB converts  null.Bool to a bool value that can be used to store into DB
+func (b Bool) MarshalDB() (interface{}, error) {
+	if !b.Valid {
+		return nil, nil
+	}
+	return b.Bool, nil
+}
+
+// MarshalDB converts a string  when read from db to a null.Bool
+func (b *Bool) UnmarshalDB(v interface{}) error {
+	switch t := v.(type) {
+	case string:
+		b.UnmarshalText([]byte(t))
+	case nil:
+		b.Valid = false
+	default:
+		return ErrUnsupportedValue
+	}
+
+	return nil
 }
