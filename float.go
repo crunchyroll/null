@@ -115,3 +115,27 @@ func (f Float) Ptr() *float64 {
 func (f Float) IsZero() bool {
 	return !f.Valid
 }
+
+// For Upper.io compatibility implementing MarshalDB/UnmarshalDB
+
+// MarshalDB converts  null.Int to a float64 value that can be used to store into DB
+func (f Float) MarshalDB() (interface{}, error) {
+	if !f.Valid {
+		return nil, nil
+	}
+	return f.Float64, nil
+}
+
+// MarshalDB converts a string  when read from db to a null.Float
+func (f *Float) UnmarshalDB(v interface{}) error {
+	switch t := v.(type) {
+	case string:
+		f.UnmarshalText([]byte(t))
+	case nil:
+		f.Valid = false
+	default:
+		return ErrUnsupportedValue
+	}
+
+	return nil
+}

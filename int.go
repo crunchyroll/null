@@ -116,3 +116,27 @@ func (i Int) Ptr() *int64 {
 func (i Int) IsZero() bool {
 	return !i.Valid
 }
+
+// For Upper.io compatibility implementing MarshalDB/UnmarshalDB
+
+// MarshalDB converts  null.Int to a int value that can be used to store into DB
+func (i Int) MarshalDB() (interface{}, error) {
+	if !i.Valid {
+		return nil, nil
+	}
+	return i.Int64, nil
+}
+
+// MarshalDB converts a string  when read from db to a null.Int
+func (i *Int) UnmarshalDB(v interface{}) error {
+	switch t := v.(type) {
+	case string:
+		i.UnmarshalText([]byte(t))
+	case nil:
+		i.Valid = false
+	default:
+		return ErrUnsupportedValue
+	}
+
+	return nil
+}
