@@ -131,6 +131,8 @@ func (f *Float) UnmarshalDB(v interface{}) error {
 	switch t := v.(type) {
 	case string:
 		f.UnmarshalText([]byte(t))
+	case []byte:
+		f.UnmarshalText(t)
 	case nil:
 		f.Valid = false
 	default:

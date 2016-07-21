@@ -149,6 +149,8 @@ func (t Time) UnmarshalDB(v interface{}) error {
 	switch ty := v.(type) {
 	case string:
 		t.UnmarshalText([]byte(ty))
+	case []byte:
+		t.UnmarshalText(ty)
 	case nil:
 		t.Valid = false
 	default:

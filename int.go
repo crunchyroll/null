@@ -132,8 +132,13 @@ func (i *Int) UnmarshalDB(v interface{}) error {
 	switch t := v.(type) {
 	case string:
 		i.UnmarshalText([]byte(t))
+	case []byte:
+		i.UnmarshalText(t)
 	case nil:
 		i.Valid = false
+	case int64:
+		i.Int64 = t
+		i.Valid = true
 	default:
 		return ErrUnsupportedValue
 	}
