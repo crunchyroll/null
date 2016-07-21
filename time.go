@@ -147,8 +147,8 @@ func (t Time) MarshalDB() (interface{}, error) {
 // MarshalDB converts a string  when read from db to a null.Bool
 func (t Time) UnmarshalDB(v interface{}) error {
 	switch ty := v.(type) {
-	case string:
-		t.UnmarshalText([]byte(ty))
+	case []byte, string:
+		t.UnmarshalText(ty.([]byte))
 	case nil:
 		t.Valid = false
 	default:

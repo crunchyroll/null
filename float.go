@@ -129,8 +129,8 @@ func (f Float) MarshalDB() (interface{}, error) {
 // MarshalDB converts a string  when read from db to a null.Float
 func (f *Float) UnmarshalDB(v interface{}) error {
 	switch t := v.(type) {
-	case string:
-		f.UnmarshalText([]byte(t))
+	case []byte, string:
+		f.UnmarshalText(t.([]byte))
 	case nil:
 		f.Valid = false
 	default:

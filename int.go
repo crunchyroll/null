@@ -130,10 +130,13 @@ func (i Int) MarshalDB() (interface{}, error) {
 // MarshalDB converts a string  when read from db to a null.Int
 func (i *Int) UnmarshalDB(v interface{}) error {
 	switch t := v.(type) {
-	case string:
-		i.UnmarshalText([]byte(t))
+	case []byte, string:
+		i.UnmarshalText(t.([]byte))
 	case nil:
 		i.Valid = false
+	case int64:
+		i.Int64 = t
+		i.Valid = true
 	default:
 		return ErrUnsupportedValue
 	}
